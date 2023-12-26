@@ -1,0 +1,131 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Description": "An AWS Serverless Application that uses the ASP.NET Core framework running in Amazon Lambda.",
+  "Parameters": {},
+  "Conditions": {},
+  "Resources": {
+    "AspNetCoreFunction": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "PackageType": "Image",
+        "ImageConfig": {
+          "Command": [
+            "serverless-blogging-platform::ServerlessBloggingPlatform.LambdaEntryPoint::FunctionHandlerAsync"
+          ]
+        },
+        "ImageUri": "",
+        "MemorySize": 256,
+        "Timeout": 30,
+        "Role": null,
+        "Policies": [
+          "AWSLambda_FullAccess"
+        ],
+        "Events": {
+          "ProxyResource": {
+            "Type": "Api",
+            "Properties": {
+              "Path": "/{proxy+}",
+              "Method": "ANY"
+            }
+          },
+          "RootResource": {
+            "Type": "Api",
+            "Properties": {
+              "Path": "/",
+              "Method": "ANY"
+            }
+          }
+        }
+      },
+      "Metadata": {
+        "Dockerfile": "Dockerfile",
+        "DockerContext": ".",
+        "DockerTag": ""
+      }
+    },
+    "PostTableProd": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "Id",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "Title",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "Content",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "AuthorId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "Id",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1
+        },
+        "TableName": "posts-prod"
+      }
+    },
+    "CommentTableProd": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "Id",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "Content",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "AuthorId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "PostId",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "Id",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 1,
+          "WriteCapacityUnits": 1
+        },
+        "TableName": "comments-prod"
+      }
+    },
+    "AssetBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": "serverless-blogging-platform-assets-prod-asaga9gud",
+        "AccessControl": "PublicRead"
+      }
+    }
+  },
+  "Outputs": {
+    "ApiURL": {
+      "Description": "API endpoint URL for Prod environment",
+      "Value": {
+        "Fn::Sub": "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+      }
+    }
+  }
+}
