@@ -1,0 +1,6 @@
+
+{
+    "s3-bucket" : "serveless-blogging-platform-9000",
+    "template"  : "src/serverless-blogging-platform/serverless.template",
+    "stack-name" : "serverless-blogging-platform"
+}

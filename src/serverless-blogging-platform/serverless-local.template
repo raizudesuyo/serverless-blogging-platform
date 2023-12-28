@@ -2,54 +2,10 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
   "Description": "An AWS Serverless Application that uses the ASP.NET Core framework running in Amazon Lambda.",
-  "Parameters": {    
-    "Param1": {
-      "Type": "String",
-      "Description": "Sample parameter"
-    }
-  },
+  "Parameters": {},
   "Conditions": {},
   "Resources": {
-    "AspNetCoreFunction": {
-      "Type": "AWS::Serverless::Function",
-      "Properties": {
-        "PackageType": "Image",
-        "ImageConfig": {
-          "Command": [
-            "serverless-blogging-platform::ServerlessBloggingPlatform.LambdaEntryPoint::FunctionHandlerAsync"
-          ]
-        },
-        "ImageUri": "",
-        "MemorySize": 256,
-        "Timeout": 30,
-        "Role": null,
-        "Policies": [
-          "AWSLambda_FullAccess"
-        ],
-        "Events": {
-          "ProxyResource": {
-            "Type": "Api",
-            "Properties": {
-              "Path": "/{proxy+}",
-              "Method": "ANY"
-            }
-          },
-          "RootResource": {
-            "Type": "Api",
-            "Properties": {
-              "Path": "/",
-              "Method": "ANY"
-            }
-          }
-        }
-      },
-      "Metadata": {
-        "Dockerfile": "Dockerfile",
-        "DockerContext": ".",
-        "DockerTag": ""
-      }
-    },
-    "PostTableProd": {
+    "PostTableLocal": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
         "AttributeDefinitions": [
@@ -90,10 +46,10 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1
         },
-        "TableName": "posts-prod"
+        "TableName": "posts-local"
       }
     },
-    "CommentTableProd": {
+    "CommentTableLocal": {
       "Type": "AWS::DynamoDB::Table",
       "Properties": {
         "AttributeDefinitions": [
@@ -154,7 +110,7 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1
         },
-        "TableName": "comments-prod"
+        "TableName": "comments-local"
       }
     },
     "AssetsTable": {
@@ -176,21 +132,13 @@
           "ReadCapacityUnits": 1,
           "WriteCapacityUnits": 1
         },
-        "TableName": "assets-prod"
+        "TableName": "assets-local"
       }
     },
-    "AssetBucket": {
+    "AssetBucketLocal": {
       "Type": "AWS::S3::Bucket",
       "Properties": {
-        "BucketName": "serverless-blogging-platform-assets-prod-asaga9gud"
-      }
-    }
-  },
-  "Outputs": {
-    "ApiURL": {
-      "Description": "API endpoint URL for Prod environment",
-      "Value": {
-        "Fn::Sub": "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+        "BucketName": "serverless-blogging-platform-assets-local-asaga9gud"
       }
     }
   }
